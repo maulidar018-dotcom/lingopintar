@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>LingoPintar - Belajar Bahasa Inggris</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Nunito', sans-serif; touch-action: pan-y; }
+        
+        .btn-bouncy {
+            transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-bouncy:active:not(:disabled) {
+            transform: translateY(4px);
+            box-shadow: 0 0px 0 transparent !important;
+        }
+        .btn-bouncy:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .word-piece {
+            display: inline-block;
+            padding: 8px 16px;
+            margin: 4px;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-bottom-width: 4px;
+            border-radius: 12px;
+            font-weight: 700;
+            color: #374151;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s;
+        }
+        .word-piece:hover { background: #f3f4f6; }
+        .word-piece.selected { background: #e5e7eb; color: #9ca3af; border-color: #d1d5db; pointer-events: none; }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+        .shake-animation { animation: shake 0.4s ease-in-out; }
+
+        .progress-bar-fill {
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+</head>
+<body class="bg-white h-screen font-sans antialiased text-gray-800 flex flex-col relative overflow-hidden">
+
+    <!-- LAYAR AWAL: Pemilihan Level -->
+    <div id="start-screen" class="flex flex-col h-full w-full bg-white z-50 p-6 absolute inset-0 overflow-y-auto">
+        <div class="text-center mt-6 mb-8">
+            <div class="w-24 h-24 bg-blue-100 rounded-full mx-auto flex items-center justify-center text-5xl mb-4 border-4 border-blue-200">
+                🦉
+            </div>
+            <h1 class="text-4xl font-extrabold text-blue-500 mb-2">LingoPintar</h1>
+            <h2 class="text-xl font-bold text-gray-600">Pilih Levelmu</h2>
+            <p class="text-gray-500 mt-1 text-sm">Ada 10 tingkatan yang harus kamu taklukkan!</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-grow max-w-2xl mx-auto w-full pb-10">
+            <!-- Level 1 -->
+            <button onclick="selectLevel('level1')" class="btn-bouncy w-full p-4 bg-white border-2 border-green-400 rounded-2xl flex items-center gap-4 hover:bg-green-50" style="box-shadow: 0 4px 0 #4ade80;">
+                <div class="text-3xl">✈️</div>
+                <div class="text-left">
+                    <div class="font-bold text-lg text-green-600">1. Pengalaman</div>
+                    <div class="text-xs text-gray-500">Present Perfect (Have you...)</div>
+                </div>
+            </button>
+            
+            <!-- Level 2 -->
+            <button onclick="selectLevel('level2')" class="btn-bouncy w-full p-4 bg-white border-2 border-emerald-400 rounded-2xl flex items-center gap-4 hover:bg-emerald-50" style="box-shadow: 0 4px 0 #34d399;">
+                <div class="text-3xl">🧳</div>
+                <div class="text-left">
+                    <div class="font-bold text-lg text-emerald-600">2. Bepergian</div>
+                    <div class="text-xs text-gray-500">Bandara, Hotel, Liburan</div>
+                </div>
+            </button>
+
+            <!-- Level 3 -->
+            <button onclick="selectLevel('level3')" class="btn-bouncy w-full p-4 bg-white border-2 border-teal-400 rounded-2xl flex items-center gap-4 hover:bg-teal-50" style="box-shadow: 0 4px 0 #2dd4bf;">
+                <div class="text-3xl">💼</div>
+                <div class="text-left">
+                    <div class="font-bold text-lg text-teal-600">3. Karir & Kerja</div>
+                    <div class="text-xs text-gray-500">Wawancara, Rapat, Proyek</div>
+                </div>
+            </button>
+
+            <!-- Level 4 -->
+            <button onclick="selectLevel('level4')" class="btn-bouncy w-full p-4 bg-white border-2 border-red-400 rounded-2xl flex items-center gap-4 hover:bg-red-50" style="box-shadow: 0 4px 0 #f87171;">
+                <div class="text-3xl">🤔</div>
+                <div class="text-left">
+                    <div class="font-bold text-lg text-red-600">4. Pengandaian</div>
+                    <div class="text-xs text-gray-500">If Clauses (Zero, 1st, 2nd)</div>
+                </div>
+            </button>
+
+            <!-- Level 5 -->
+            <button onclick="selectLevel('level5')" class="btn-bouncy w-full p-4 bg-white border-2 border-orange-400 rounded-2xl flex items-center gap-4 hover:bg-orange-50" style="box-shadow: 0 4px 0 #fb923c;">
+                <div class="text-3xl">🎓</div>
+                <div class="text-left">
+                    <div class="font-bold text-lg text-orange-600">5. Pendidikan</div>
+                    <div class="text-xs text-gray-500">Ujian, Universitas, Belajar</div>
+                </div>
+            </button>
+
+            <!-- Level 6 -->
+            <button onclick="selectLevel('level6')" class="btn-bouncy w-full p-4 bg-white border-2 border-pink-400 rounded-2xl flex items-center gap-4 hover:bg-pink-50" style="box-shadow: 0 4px 0 #f472b6;">
+                <div class="text-3xl">📖</div>
+                <div class="text-left">
+                    <div class="font-bold text-lg text-pink-600">6. Cerita Lalu</div>
+                    <div class="text-xs text-gray-500">Past Continuous & Simple</div>
+                </div>
+            </button>
+
+            <!-- Level 7 -->
+            <button onclick="selectLevel('level7')" class="btn-bouncy w-full p-4 bg-white border-2 border-indigo-400 rounded-2xl flex items-center gap-4 hover:bg-indigo-50" style="box-shadow: 0 4px 0 #818cf8;">
+                <div class="text-3xl">💡</div>
+                <div class="text-left">
+                    <div class="font-bold text-lg text-indigo-600">7. Saran & Modals</div>
+                    <div class="text-xs text-gray-500">Should, Must, Might, Could</div>
+                </div>
+            </button>
+
+            <!-- Level 8 -->
+            <button onclick="selectLevel('level8')" class="btn-bouncy w-full p-4 bg-white border-2 border-yellow-400 rounded-2xl flex items-center gap-4 hover:bg-yellow-50" style="box-shadow: 0 4px 0 #facc15;">
+                <div class="text-3xl">🍿</div>
+                <div class="text-left">
+                    <div class="font-bold text-lg text-yellow-600">8. Hiburan</div>
+                    <div class="text-xs text-gray-500">Film, Konser, Ulasan</div>
+                </div>
+            </button>
+
+            <!-- Level 9 -->
+            <button onclick="selectLevel('level9')" class="btn-bouncy w-full p-4 bg-white border-2 border-blue-400 rounded-2xl flex items-center gap-4 hover:bg-blue-50" style="box-shadow: 0 4px 0 #60a5fa;">
+                <div class="text-3xl">⚙️</div>
+                <div class="text-left">
+                    <div class="font-bold text-lg text-blue-600">9. Kalimat Pasif</div>
+                    <div class="text-xs text-gray-500">Passive Voice (is made by)</div>
+                </div>
+            </button>
+
+            <!-- Level 10 -->
+            <button onclick="selectLevel('level10')" class="btn-bouncy w-full p-4 bg-white border-2 border-purple-400 rounded-2xl flex items-center gap-4 hover:bg-purple-50" style="box-shadow: 0 4px 0 #c084fc;">
+                <div class="text-3xl">🗣️</div>
+                <div class="text-left">
+                    <div class="font-bold text-lg text-purple-600">10. Opini</div>
+                    <div class="text-xs text-gray-500">In my opinion, I disagree</div>
+                </div>
+            </button>
+        </div>
+    </div>
+
+    <!-- LAYAR UTAMA: Kuis/Pelajaran -->
+    <div id="app-screen" class="hidden flex-col h-full w-full absolute inset-0">
+        
+        <!-- Header (Progress, Hearts, XP) -->
+        <header class="flex items-center justify-between p-4 max-w-3xl mx-auto w-full gap-4">
+            <button onclick="goToStartScreen()" class="text-gray-400 hover:text-gray-600 text-2xl font-bold px-2">✕</button>
+            <div class="flex-grow h-4 bg-gray-200 rounded-full overflow-hidden relative">
+                <div id="progress-bar" class="progress-bar-fill h-full bg-green-500 rounded-full absolute left-0 top-0" style="width: 0%;">
+                    <div class="w-full h-1 bg-white opacity-30 mt-0.5 rounded-full mx-1"></div>
+                </div>
+            </div>
+            <div class="flex items-center gap-1 font-bold text-red-500 text-lg">
+                <span>❤️</span> <span id="hearts-count">5</span>
+            </div>
+            <div class="flex items-center gap-1 font-bold text-blue-500 text-lg">
+                <span>💎</span> <span id="xp-count">0</span>
+            </div>
+        </header>
+
+        <!-- Area Pertanyaan -->
+        <main class="flex-grow flex flex-col px-6 py-2 max-w-3xl mx-auto w-full overflow-y-auto pb-32">
+            <h2 class="text-2xl font-bold mb-6 text-gray-800" id="question-title">Terjemahkan kalimat ini</h2>
+            
+            <div class="flex items-start gap-4 mb-8">
+                <!-- GAMBAR KUCING BARU -->
+                <div class="w-24 h-24 bg-orange-100 rounded-full hidden sm:flex items-center justify-center text-6xl border-4 border-orange-200 shrink-0 select-none shadow-inner">
+                    🐱
+                </div>
+
+                <div class="bg-white border-2 border-gray-200 rounded-2xl p-4 relative flex-grow flex items-center gap-3">
+                    <div class="absolute -left-3 top-6 w-4 h-4 bg-white border-l-2 border-b-2 border-gray-200 transform rotate-45 hidden sm:block"></div>
+                    <button onclick="playTTS()" class="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center hover:bg-blue-600 active:scale-95 shrink-0 shadow-md">
+                        🔊
+                    </button>
+                    <p class="text-lg font-medium text-gray-700" id="question-text">Pemuatan soal...</p>
+                </div>
+            </div>
+
+            <!-- Kontainer Jawaban Pilihan Ganda -->
+            <div id="options-container" class="grid grid-cols-1 gap-3 hidden">
+                <!-- Opsi diinjeksi via JS -->
+            </div>
+
+            <!-- Kontainer Jawaban Susun Kata -->
+            <div id="arrange-container" class="hidden flex-col gap-4">
+                <div id="arrange-dropzone" class="min-h-[60px] border-b-2 border-gray-300 border-dashed pb-2 flex flex-wrap gap-2 items-center">
+                    <!-- Kata yang dipilih akan muncul di sini -->
+                </div>
+                <div id="arrange-words" class="flex flex-wrap gap-2 justify-center mt-4">
+                    <!-- Kata acak diinjeksi via JS -->
+                </div>
+            </div>
+        </main>
+
+        <!-- Bilah Bawah (Feedback & Tombol) -->
+        <div id="feedback-area" class="absolute bottom-0 w-full border-t-2 border-gray-200 bg-white p-4 sm:p-6 transition-colors duration-300">
+            <div class="max-w-3xl mx-auto w-full">
+                <!-- Pesan Feedback (Benar/Salah) -->
+                <div id="feedback-message" class="hidden mb-4 flex items-center gap-3">
+                    <div id="feedback-icon" class="w-10 h-10 rounded-full flex items-center justify-center text-xl font-bold text-white shrink-0"></div>
+                    <div>
+                        <h3 id="feedback-title" class="font-bold text-xl">Luar Biasa!</h3>
+                        <p id="feedback-desc" class="text-base opacity-90 hidden">Jawaban yang benar: <span id="correct-answer-text" class="font-bold"></span></p>
+                    </div>
+                </div>
+
+                <button id="check-btn" onclick="handleMainAction()" class="btn-bouncy w-full py-4 bg-gray-200 text-gray-400 font-bold rounded-xl text-xl uppercase tracking-wider disabled:opacity-50" disabled>
+                    Cek Jawaban
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- LAYAR PENYELESAIAN LEVEL -->
+    <div id="completion-screen" class="hidden flex-col h-full w-full bg-white z-50 p-6 absolute inset-0 overflow-y-auto items-center justify-center">
+        <div class="text-center w-full max-w-md">
+            <div class="text-7xl mb-4 animate-bounce">🏆</div>
+            <h1 class="text-4xl font-extrabold text-yellow-500 mb-2">Pelajaran Selesai!</h1>
+            <p class="text-gray-500 mb-8">Luar biasa! Kamu berhasil menaklukkan level ini.</p>
+            
+            <div class="bg-blue-50 rounded-2xl p-6 mb-8 border-2 border-blue-100 flex justify-between items-center text-xl font-bold text-blue-600">
+                <span>Total XP Diperoleh:</span>
+                <span class="flex items-center gap-2">💎 <span id="final-xp">0 XP</span></span>
+            </div>
+            
+            <div class="flex flex-col sm:flex-row gap-4 w-full">
+                <button onclick="continueLesson()" class="btn-bouncy flex-1 py-4 bg-white text-blue-500 border-2 border-blue-200 font-bold rounded-xl text-xl hover:bg-blue-50" style="box-shadow: 0 4px 0 #bfdbfe;">
+                    Lanjut Belajar
+                </button>
+                <button onclick="goToStartScreen()" class="btn-bouncy flex-1 py-4 bg-blue-500 text-white font-bold rounded-xl text-xl hover:bg-blue-600" style="box-shadow: 0 4px 0 #1d4ed8;">
+                    Menu Utama
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- DATABASE SOAL B1 (10 Level x 10 Soal = 100 Soal) ---
+        const questionDatabase = {
+            level1: [ // Pengalaman (Present Perfect)
+                { type: 'choice', title: 'Terjemahkan', question: 'Saya belum pernah ke London sebelumnya.', options: ['I have never been to London before.', 'I never went to London before.', 'I had never been to London before.'], answer: 'I have never been to London before.' },
+                { type: 'arrange', title: 'Susun kalimat', question: 'Apakah kamu sudah menyelesaikan pekerjaan rumahmu?', words: ['Have', 'you', 'finished', 'your', 'homework', 'yet', '?'], answer: 'Have you finished your homework yet ?' },
+                { type: 'choice', title: 'Pilih terjemahan', question: 'Dia sudah bekerja di sini selama lima tahun.', options: ['She is working here for five years.', 'She has worked here for five years.', 'She worked here since five years.'], answer: 'She has worked here for five years.' },
+                { type: 'arrange', title: 'Susun kalimat', question: 'Kami sudah saling kenal sejak masa kecil.', words: ['We', 'have', 'known', 'each', 'other', 'since', 'childhood'], answer: 'We have known each other since childhood' },
+                { type: 'choice', title: 'Pilih kata yang tepat', question: 'Saya baru saja meminum secangkir kopi.', options: ['I have just drunk a cup of coffee.', 'I just drink a cup of coffee.', 'I have just drank a cup of coffee.'], answer: 'I have just drunk a cup of coffee.' },
+                { type: 'arrange', title: 'Susun kalimat', question: 'Ini adalah film terbaik yang pernah saya tonton.', words: ['This', 'is', 'the', 'best', 'movie', 'I', 'have', 'ever', 'seen'], answer: 'This is the best movie I have ever seen' },
+                { type: 'choice', title: 'Terjemahkan', question: 'Mereka belum membalas email saya.', options: ['They have not replied to my email.', 'They did not reply my email.', 'They are not replying to my email.'], answer: 'They have not replied to my email.' },
+                { type: 'arrange', title: 'Susun kalimat', question: 'Berapa lama kamu tinggal di kota ini?', words: ['How', 'long', 'have', 'you', 'lived', 'in', 'this', 'city', '?'], answer: 'How long have you lived in this city ?' },
+                { type: 'choice', title: 'Pilih terjemahan', question: 'Dia telah kehilangan paspornya.', options: ['He has lost his passport.', 'He loses his passport.', 'He losts his passport.'], answer: 'He has lost his passport.' },
+                { type: 'arrange', title: 'Susun kalimat', question: 'Saya belum pernah mencoba makanan ini.', words: ['I', 'have', 'never', 'tried', 'this', 'food'], answer: 'I have never tried this food' }
+            ],
+            level2: [ // Bepergian (Travel & Transport)
+                { type: 'choice', title: 'Terjemahkan', question: 'Penerbangan kita ditunda karena cuaca buruk.', options: ['Our flight was delayed due to bad weather.', 'Our flight is delay because bad weather.', 'Our flight delayed from bad weather.'], answer: 'Our flight was delayed due to bad weather.' },
+                { type: 'arrange', title: 'Susun kalimat', question: 'Saya ingin memesan kamar untuk dua malam.', words: ['I', 'would', 'like', 'to', 'book', 'a', 'room', 'for', 'two', 'nights'], answer: 'I would like to book a room for two nights' },
+                { type: 'choice', title: 'Pilih terjemahan', question: 'Berapa biaya tiket ke museum?', options: ['How many does the ticket to the museum cost?', 'How much is the ticket to the museum?', 'What is the price for ticket museum?'], answer: 'How much is the ticket to the museum?' },
+                { type: 'arrange', title: 'Susun kalimat', question: 'Kita perlu berada di bandara jam enam pagi.', words: ['We', 'need', 'to', 'be', 'at', 'the', 'airport', 'at', 'six', 'in', 'the', 'morning'], answer: 'We need to be at the airport at six in the morning' },
+                { type: 'choice', title: 'Pilih kata yang tepat', question: 'Penumpang tidak diizinkan membawa cairan.', options: ['Passengers are not allowed to bring liquids.', 'Passengers do not allowed to bring liquids.', 'Passengers are not letting to bring liquids.'], answer: 'Passengers are not allowed to bring liquids.' },
+                { type: 'arrange', title: 'Susun kalimat', question: 'Bolehkah saya melihat paspor dan tiket Anda?', words: ['May', 'I', 'see', 'your', 'passport', 'and', 'ticket', '?'], answer: 'May I see your passport and ticket ?' },
+                { type: 'choice', title: 'Terjemahkan', question: 'Kereta berangkat dari peron empat.', options: ['The train leaves from platform four.', 'The train goes on platform four.', 'The train departs in platform four.'], answer: 'The train leaves from platform four.' },
+                { type: 'arrange', title: 'Susun kalimat', question: 'Perjalanan memakan waktu sekitar tiga jam dengan mobil.', words: ['The', 'journey', 'takes', 'about', 'three', 'hours', 'by', 'car'], answer: 'The journey takes about three hours by car' },
+                { type: 'choice', title: 'Pilih terjemahan', question: 'Di mana saya bisa mengambil bagasi saya?', options: ['Where can I find my bags?', 'Where can I claim my baggage?', 'Where do I take my luggage?'], answer: 'Where can I claim my baggage?' },
+                { type: 'arrange', title: 'Susun kalimat', question: 'Hotel ini menawarkan sarapan gratis untuk para tamu.', words: ['This', 'hotel', 'offers', 'free', 'breakfast', 'for', 'guests'], answer: 'This hotel offers free breakfast for guests' }
+            ],
+            level3: [ // Karir & Kerja (Work & Ambitions)
+                { type: 'choice', title: 'Terjemahkan', question: 'Dia sedang mencari pekerjaan baru di bidang pemasaran.', options: ['She is looking for a new job in marketing.', 'She looks a new work in marketing.', 'She is searching a new job on marketing.'], answer: 'She is looking for a new job in marketing.' },
+                { type: 'arrange', title: 'Susun kalimat', question: 'Rapat telah dijadwalkan ulang ke hari Jumat.', words: ['The', 'meeting', 'has', 'been', 'rescheduled', 'to', 'Friday'], answer: 'The meeting has been rescheduled to Friday' },
+                { type: 'choice', title: 'Pilih terjemahan', question: 'Saya bertanggung jawab untuk mengelola tim.', options: ['I am responsible for managing the team.', 'I am responsibility to manage the team.', 'I have responsibility for manage the team.'], answer: 'I am responsible for managing the team.' },
+                { type: 'arrange', title: 'Susun kalimat', question: 'Apakah kamu memiliki pengalaman di bidang ini?', words: ['Do', 'you', 'have', 'any', 'experience', 'in', 'this', 'field', '?'], answer: 'Do you have any experience in this field ?' },
+                { type: 'choice', title: 'Pilih kata yang tepat', question: 'Perusahaan akan merekrut karyawan baru bulan depan.', options: ['The company will hire new employees next month.', 'The company will rent new workers next month.', 'The company will employ new staff next month.'], answer: 'The company will hire new employees next month.' },
+                { type: 'arrange', title: 'Susun kalimat', question: 'Tolong kirimkan resume Anda ke alamat email kami.', words: ['Please', 'send', 'your', 'resume', 'to', 'our', 'email', 'address'], answer: 'Please send your resume to our email address' },
+                { type: 'choice', title: 'Terjemahkan', question: 'Tenggat waktu untuk proyek ini adalah besok.', options: ['The deadline for this project is tomorrow.', 'The time limit for this project is tomorrow.', 'The end time for this project is tomorrow.'], answer: 'The deadline for this project is tomorrow.' },
+                { type: 'arrange', title: 'Susun kalimat', question: 'Dia dipromosikan menjadi manajer minggu lalu.', words: ['He', 'was', 'promoted', 'to', 'manager', 'last', 'week'], answer: 'He was promoted to manager last week' },
+                { type: 'choice', title: 'Pilih terjemahan', question: 'Saya ingin mendiskusikan gaji saya.', options: ['I would like to discuss my salary.', 'I want to talk my money.', 'I would like to argue my payment.'], answer: 'I would like to discuss my salary.' },
+                { type: 'arrange', title: 'Susun kalimat', question: 'Kita harus memecahkan masalah ini secepat mungkin.', words: ['We', 'must', 'solve', 'this', 'problem', 'as', 'soon', 'as', 'possible'], answer: 'We must solve this problem as soon as possible' }
+            ],
+            level4: [ // Pengandaian (Conditionals)
+                { type: 'choice', title: 'Terjemahkan', question: 'Jika turun hujan, kita akan membatalkan piknik.', options: ['If it rains, we will cancel the picnic.', 'If it rain, we cancel the picnic.', 'If it is raining, we cancelled the picnic.'], answer: 'If it rains, we will cancel the picnic.' },
+                { type: 'arrange', title: 'Susun kalimat', question: 'Jika saya punya banyak uang, saya akan berkeliling dunia.', words: ['If', 'I', 'had', 'a', 'lot', 'of', 'money', ',', 'I', 'would', 'travel', 'the', 'world'], answer: 'If I had a lot of money , I would travel the world' },
+                { type: 'choice', title: 'Pilih terjemahan', question: 'Jika kamu memanaskan air, ia mendidih.', options: ['If you heat water, it boils.', 'If you heated water, it boils.', 'If you are heating water, it is boiling.'], answer: 'If you heat water, it boils.' },
+                { type: 'arrange', title: 'Susun kalimat', question: 'Saya akan meneleponmu jika saya punya waktu.', words: ['I', 'will', 'call', 'you', 'if', 'I', 'have', 'time'], answer: 'I will call you if I have time' },
+                { type: 'choice', title: 'Pilih kata yang tepat', question: 'Jika dia belajar lebih giat, dia akan lulus ujian.', options: ['If he studied harder, he would pass the exam.', 'If he studies harder, he would pass the exam.', 'If he study hard, he will pass the exam.'], answer: 'If he studied harder, he would pass the exam.' },
+                { type: 'arrange', title: 'Susun kalimat', question: 'Apa yang akan kamu lakukan jika kamu kehilangan ponselmu?', words: ['What', 'would', 'you', 'do', 'if', 'you', 'lost', 'your', 'phone', '?'], answer: 'What would you do if you lost your phone ?' },
+                { type: 'choice', title: 'Terjemahkan', question: 'Kecuali kamu bergegas, kita akan terlambat.', options: ['Unless you hurry, we will be late.', 'If not you hurry, we will be late.', 'Except you hurry, we are late.'], answer: 'Unless you hurry, we will be late.' },
+                { type: 'arrange', title: 'Susun kalimat', question: 'Jika saya adalah kamu, saya tidak akan melakukan itu.', words: ['If', 'I', 'were', 'you', ',', 'I', 'would', 'not', 'do', 'that'], answer: 'If I were you , I would not do that' },
+                { type: 'choice', title: 'Pilih terjemahan', question: 'Kita bisa pergi ke pantai jika cuacanya cerah besok.', options: ['We can go to the beach if the weather is sunny tomorrow.', 'We could go to the beach if the weather will sunny tomorrow.', 'We go to the beach if weather sunny tomorrow.'], answer: 'We can go to the beach if the weather is sunny tomorrow.' },
+                { type: 'arrange', title: 'Susun kalimat', question: 'Dia akan marah jika kamu lupa hari ulang tahunnya.', words: ['She', 'will', 'be', 'angry', 'if', 'you', 'forget', 'her', 'birthday'], answer: 'She will be angry if you forget her birthday' }
+            ],
+            level5: [ // Pendidikan (Education)
+                { type: 'choice', title: 'Terjemahkan', question: 'Saya harus lulus ujian ini untuk masuk universitas.', options: ['I must pass this exam to enter university.', 'I have to pass this exam for entering university.', 'I must to pass this exam to go to university.'], answer: 'I must pass this exam to enter university.' },
+                { type: 'arrange', title: 'Susun kalimat', question: 'Dia berencana untuk belajar teknik di luar negeri.', words: ['He', 'plans', 'to', 'study', 'engineering', 'abroad'], answer: 'He plans to study engineering abroad' },
+                { type: 'choice', title: 'Pilih terjemahan', question: 'Penelitian ini berfokus pada perubahan iklim.', options: ['This research focuses on climate change.', 'This study is focus to climate change.', 'The research focusing on climate change.'], answer: 'This research focuses on climate change.' },
+                { type: 'arrange', title: 'Susun kalimat', question: 'Gurunya menjelaskan pelajaran dengan sangat jelas.', words: ['The', 'teacher', 'explained', 'the', 'lesson', 'very', 'clearly'], answer: 'The teacher explained the lesson very clearly' },
+                { type: 'choice', title: 'Pilih kata yang tepat', question: 'Apakah kamu sudah mengumpulkan tugasmu?', options: ['Have you submitted your assignment?', 'Have you given your assignment?', 'Did you send your homework yet?'], answer: 'Have you submitted your assignment?' },
+                { type: 'arrange', title: 'Susun kalimat', question: 'Banyak mahasiswa melakukan pekerjaan paruh waktu.', words: ['Many', 'university', 'students', 'do', 'part-time', 'jobs'], answer: 'Many university students do part-time jobs' },
+                { type: 'choice', title: 'Terjemahkan', question: 'Saya selalu merasa gugup sebelum presentasi.', options: ['I always feel nervous before a presentation.', 'I always am nervous before presenting.', 'I feel always nervous before a presentation.'], answer: 'I always feel nervous before a presentation.' },
+                { type: 'arrange', title: 'Susun kalimat', question: 'Perpustakaan adalah tempat yang tenang untuk belajar.', words: ['The', 'library', 'is', 'a', 'quiet', 'place', 'to', 'study'], answer: 'The library is a quiet place to study' },
+                { type: 'choice', title: 'Pilih terjemahan', question: 'Dia mendapat nilai bagus di tes matematika.', options: ['She got a good grade in the math test.', 'She took a good mark on math test.', 'She received a good score for math test.'], answer: 'She got a good grade in the math test.' },
+                { type: 'arrange', title: 'Susun kalimat', question: 'Pendidikan sangat penting untuk kesuksesan di masa depan.', words: ['Education', 'is', 'very', 'important', 'for', 'future', 'success'], answer: 'Education is very important for future success' }
+            ],
+            level6: [ // Cerita Lalu (Past Continuous & Simple)
+                { type: 'choice', title: 'Terjemahkan', question: 'Saya sedang tidur ketika telepon berdering.', options: ['I was sleeping when the phone rang.', 'I slept when the phone was ringing.', 'I am sleeping when the phone rings.'], answer: 'I was sleeping when the phone rang.' },
+                { type: 'arrange', title: 'Susun kalimat', question: 'Sementara kami sedang menonton TV, listrik padam.', words: ['While', 'we', 'were', 'watching', 'TV', ',', 'the', 'power', 'went', 'out'], answer: 'While we were watching TV , the power went out' },
+                { type: 'choice', title: 'Pilih terjemahan', question: 'Apa yang sedang kamu lakukan jam 8 malam kemarin?', options: ['What were you doing at 8 PM yesterday?', 'What did you do at 8 PM yesterday?', 'What are you doing at 8 PM yesterday?'], answer: 'What were you doing at 8 PM yesterday?' },
+                { type: 'arrange', title: 'Susun kalimat', question: 'Dia sedang memasak makan malam saat saya tiba.', words: ['He', 'was', 'cooking', 'dinner', 'when', 'I', 'arrived'], answer: 'He was cooking dinner when I arrived' },
+                { type: 'choice', title: 'Pilih kata yang tepat', question: 'Matahari bersinar cerah dan burung-burung berkicau.', options: ['The sun was shining and the birds were singing.', 'The sun shined and the birds sang.', 'The sun is shining and the birds are singing.'], answer: 'The sun was shining and the birds were singing.' },
+                { type: 'arrange', title: 'Susun kalimat', question: 'Saya melihat kecelakaan itu saat saya sedang mengemudi.', words: ['I', 'saw', 'the', 'accident', 'while', 'I', 'was', 'driving'], answer: 'I saw the accident while I was driving' },
+                { type: 'choice', title: 'Terjemahkan', question: 'Mereka tidak sedang mendengarkan guru.', options: ['They were not listening to the teacher.', 'They did not listen to the teacher.', 'They are not listening to the teacher.'], answer: 'They were not listening to the teacher.' },
+                { type: 'arrange', title: 'Susun kalimat', question: 'Hujan turun dengan deras kemarin pagi.', words: ['It', 'was', 'raining', 'heavily', 'yesterday', 'morning'], answer: 'It was raining heavily yesterday morning' },
+                { type: 'choice', title: 'Pilih terjemahan', question: 'Saya menjatuhkan kunciku ketika saya sedang berlari.', options: ['I dropped my keys when I was running.', 'I was dropping my keys when I ran.', 'I drop my keys when I am running.'], answer: 'I dropped my keys when I was running.' },
+                { type: 'arrange', title: 'Susun kalimat', question: 'Dia sedang membaca buku sepanjang malam.', words: ['She', 'was', 'reading', 'a', 'book', 'all', 'evening'], answer: 'She was reading a book all evening' }
+            ],
+            level7: [ // Saran & Modals (Should, Must, Might, Could)
+                { type: 'choice', title: 'Terjemahkan', question: 'Kamu seharusnya beristirahat jika kamu lelah.', options: ['You should rest if you are tired.', 'You must rest if you are tired.', 'You can rest if you are tired.'], answer: 'You should rest if you are tired.' },
+                { type: 'arrange', title: 'Susun kalimat', question: 'Kita tidak boleh terlambat untuk pertemuan ini.', words: ['We', 'must', 'not', 'be', 'late', 'for', 'this', 'meeting'], answer: 'We must not be late for this meeting' },
+                { type: 'choice', title: 'Pilih terjemahan', question: 'Dia mungkin sedang berada di rumah sekarang.', options: ['He might be at home now.', 'He should be at home now.', 'He must be at home now.'], answer: 'He might be at home now.' },
+                { type: 'arrange', title: 'Susun kalimat', question: 'Bisakah kamu membantuku membawa tas-tas ini?', words: ['Could', 'you', 'help', 'me', 'carry', 'these', 'bags', '?'], answer: 'Could you help me carry these bags ?' },
+                { type: 'choice', title: 'Pilih kata yang tepat', question: 'Kamu tidak perlu membawa makanan, kami sudah memasak.', options: ['You don’t have to bring food, we already cooked.', 'You mustn’t bring food, we already cooked.', 'You shouldn’t bring food, we already cooked.'], answer: 'You don’t have to bring food, we already cooked.' },
+                { type: 'arrange', title: 'Susun kalimat', question: 'Itu pasti sangat sulit bagimu.', words: ['That', 'must', 'be', 'very', 'difficult', 'for', 'you'], answer: 'That must be very difficult for you' },
+                { type: 'choice', title: 'Terjemahkan', question: 'Menurutmu apa yang seharusnya saya lakukan?', options: ['What do you think I should do?', 'What do you think I must do?', 'What do you think I can do?'], answer: 'What do you think I should do?' },
+                { type: 'arrange', title: 'Susun kalimat', question: 'Mereka mungkin tidak akan datang ke pesta.', words: ['They', 'might', 'not', 'come', 'to', 'the', 'party'], answer: 'They might not come to the party' },
+                { type: 'choice', title: 'Pilih terjemahan', question: 'Kamu sebaiknya menemui dokter.', options: ['You had better see a doctor.', 'You would better see a doctor.', 'You should better see a doctor.'], answer: 'You had better see a doctor.' },
+                { type: 'arrange', title: 'Susun kalimat', question: 'Kita seharusnya belajar lebih giat untuk ujian itu.', words: ['We', 'should', 'have', 'studied', 'harder', 'for', 'that', 'exam'], answer: 'We should have studied harder for that exam' }
+            ],
+            level8: [ // Hiburan (Entertainment)
+                { type: 'choice', title: 'Terjemahkan', question: 'Film itu sangat membosankan sehingga saya tertidur.', options: ['The movie was so boring that I fell asleep.', 'The movie was very boring so I slept.', 'The movie is too boring that I fall asleep.'], answer: 'The movie was so boring that I fell asleep.' },
+                { type: 'arrange', title: 'Susun kalimat', question: 'Buku ini ditulis oleh penulis terkenal.', words: ['This', 'book', 'was', 'written', 'by', 'a', 'famous', 'author'], answer: 'This book was written by a famous author' },
+                { type: 'choice', title: 'Pilih terjemahan', question: 'Tiket konser terjual habis dalam hitungan menit.', options: ['The concert tickets sold out in minutes.', 'The concert tickets were selling out in minutes.', 'The concert tickets have sold out in minutes.'], answer: 'The concert tickets sold out in minutes.' },
+                { type: 'arrange', title: 'Susun kalimat', question: 'Akting dalam drama itu benar-benar luar biasa.', words: ['The', 'acting', 'in', 'the', 'play', 'was', 'absolutely', 'amazing'], answer: 'The acting in the play was absolutely amazing' },
+                { type: 'choice', title: 'Pilih kata yang tepat', question: 'Saya tidak terlalu suka menonton film horor.', options: ['I don’t really like watching horror movies.', 'I am not really liking watching horror movies.', 'I don’t really prefer to watch horror movies.'], answer: 'I don’t really like watching horror movies.' },
+                { type: 'arrange', title: 'Susun kalimat', question: 'Musik ini mengingatkan saya pada masa kecil saya.', words: ['This', 'music', 'reminds', 'me', 'of', 'my', 'childhood'], answer: 'This music reminds me of my childhood' },
+                { type: 'choice', title: 'Terjemahkan', question: 'Ulasannya sangat positif.', options: ['The reviews were mostly positive.', 'The reviews are very good.', 'The comments was positive.'], answer: 'The reviews were mostly positive.' },
+                { type: 'arrange', title: 'Susun kalimat', question: 'Kami bersenang-senang di festival kemarin.', words: ['We', 'had', 'a', 'great', 'time', 'at', 'the', 'festival', 'yesterday'], answer: 'We had a great time at the festival yesterday' },
+                { type: 'choice', title: 'Pilih terjemahan', question: 'Episode selanjutnya akan ditayangkan minggu depan.', options: ['The next episode will air next week.', 'The next episode is airing next week.', 'The next episode will show next week.'], answer: 'The next episode will air next week.' },
+                { type: 'arrange', title: 'Susun kalimat', question: 'Berapa banyak alat musik yang bisa kamu mainkan?', words: ['How', 'many', 'musical', 'instruments', 'can', 'you', 'play', '?'], answer: 'How many musical instruments can you play ?' }
+            ],
+            level9: [ // Kalimat Pasif (Passive Voice)
+                { type: 'choice', title: 'Terjemahkan', question: 'Mobil ini diproduksi di Jepang.', options: ['This car is manufactured in Japan.', 'This car manufactures in Japan.', 'This car was manufacturing in Japan.'], answer: 'This car is manufactured in Japan.' },
+                { type: 'arrange', title: 'Susun kalimat', question: 'Jendela itu dipecahkan oleh anak laki-laki itu.', words: ['The', 'window', 'was', 'broken', 'by', 'the', 'boy'], answer: 'The window was broken by the boy' },
+                { type: 'choice', title: 'Pilih terjemahan', question: 'Surat-surat sedang dikirim sekarang.', options: ['The letters are being delivered now.', 'The letters are delivering now.', 'The letters have been delivered now.'], answer: 'The letters are being delivered now.' },
+                { type: 'arrange', title: 'Susun kalimat', question: 'Ponsel saya dicuri kemarin malam.', words: ['My', 'phone', 'was', 'stolen', 'last', 'night'], answer: 'My phone was stolen last night' },
+                { type: 'choice', title: 'Pilih kata yang tepat', question: 'Rumah ini dibangun seratus tahun yang lalu.', options: ['This house was built a hundred years ago.', 'This house built a hundred years ago.', 'This house is built a hundred years ago.'], answer: 'This house was built a hundred years ago.' },
+                { type: 'arrange', title: 'Susun kalimat', question: 'Keputusan belum dibuat oleh manajer.', words: ['The', 'decision', 'has', 'not', 'been', 'made', 'by', 'the', 'manager'], answer: 'The decision has not been made by the manager' },
+                { type: 'choice', title: 'Terjemahkan', question: 'Penyakit itu bisa diobati dengan antibiotik.', options: ['The disease can be treated with antibiotics.', 'The disease can treat with antibiotics.', 'The disease could be treat with antibiotics.'], answer: 'The disease can be treated with antibiotics.' },
+                { type: 'arrange', title: 'Susun kalimat', question: 'Kamar-kamar dibersihkan setiap hari.', words: ['The', 'rooms', 'are', 'cleaned', 'every', 'day'], answer: 'The rooms are cleaned every day' },
+                { type: 'choice', title: 'Pilih terjemahan', question: 'Masalah ini sedang didiskusikan oleh tim.', options: ['This problem is being discussed by the team.', 'This problem is discussed by the team.', 'This problem was being discussed by the team.'], answer: 'This problem is being discussed by the team.' },
+                { type: 'arrange', title: 'Susun kalimat', question: 'Penemuannya dipublikasikan di majalah sains.', words: ['His', 'discovery', 'was', 'published', 'in', 'a', 'science', 'magazine'], answer: 'His discovery was published in a science magazine' }
+            ],
+            level10: [ // Opini (Opinions)
+                { type: 'choice', title: 'Terjemahkan', question: 'Menurut pendapat saya, itu ide yang bagus.', options: ['In my opinion, that is a good idea.', 'For my opinion, that is a good idea.', 'To my opinion, that is a good idea.'], answer: 'In my opinion, that is a good idea.' },
+                { type: 'arrange', title: 'Susun kalimat', question: 'Saya sepenuhnya setuju dengan pernyataan Anda.', words: ['I', 'completely', 'agree', 'with', 'your', 'statement'], answer: 'I completely agree with your statement' },
+                { type: 'choice', title: 'Pilih terjemahan', question: 'Sejujurnya, saya tidak suka desainnya.', options: ['To be honest, I don’t like the design.', 'Honestly speaking, I am not like the design.', 'To tell the truth, I didn’t like the design.'], answer: 'To be honest, I don’t like the design.' },
+                { type: 'arrange', title: 'Susun kalimat', question: 'Di satu sisi, ini lebih murah.', words: ['On', 'the', 'one', 'hand', ',', 'it', 'is', 'cheaper'], answer: 'On the one hand , it is cheaper' },
+                { type: 'choice', title: 'Pilih kata yang tepat', question: 'Saya khawatir saya tidak sependapat dengan Anda.', options: ['I am afraid I disagree with you.', 'I am afraid I don’t agree you.', 'I fear I disagree with you.'], answer: 'I am afraid I disagree with you.' },
+                { type: 'arrange', title: 'Susun kalimat', question: 'Namun, ada beberapa kelemahan pada rencana ini.', words: ['However', ',', 'there', 'are', 'some', 'disadvantages', 'to', 'this', 'plan'], answer: 'However , there are some disadvantages to this plan' },
+                { type: 'choice', title: 'Terjemahkan', question: 'Tampaknya bagi saya bahwa kita perlu lebih banyak waktu.', options: ['It seems to me that we need more time.', 'It looks to me that we need more time.', 'It appears to me that we are needing more time.'], answer: 'It seems to me that we need more time.' },
+                { type: 'arrange', title: 'Susun kalimat', question: 'Sejauh yang saya tahu, masalah ini telah diselesaikan.', words: ['As', 'far', 'as', 'I', 'know', ',', 'the', 'issue', 'is', 'resolved'], answer: 'As far as I know , the issue is resolved' },
+                { type: 'choice', title: 'Pilih terjemahan', question: 'Secara pribadi, saya lebih suka bekerja dari rumah.', options: ['Personally, I prefer working from home.', 'By person, I prefer working from home.', 'As a person, I prefer to work from home.'], answer: 'Personally, I prefer working from home.' },
+                { type: 'arrange', title: 'Susun kalimat', question: 'Saya percaya bahwa pendidikan harus gratis untuk semua.', words: ['I', 'believe', 'that', 'education', 'should', 'be', 'free', 'for', 'all'], answer: 'I believe that education should be free for all' }
+            ]
+        };
+
+        // --- VARIABEL STATE ---
+        let currentLevelId = '';
+        let currentQuestions = [];
+        let currentQuestionIndex = 0;
+        
+        let hearts = 5;
+        let xp = 0;
+        let correctAnswersCount = 0;
+        let totalQuestionsToPass = 10;
+        
+        let selectedAnswer = null; // Untuk mode 'choice'
+        let arrangeSelectedWords = []; // Untuk mode 'arrange'
+        let hasCheckedAnswer = false;
+
+        // --- ELEMEN DOM ---
+        const startScreen = document.getElementById('start-screen');
+        const appScreen = document.getElementById('app-screen');
+        const completionScreen = document.getElementById('completion-screen');
+        
+        const questionTitle = document.getElementById('question-title');
+        const questionText = document.getElementById('question-text');
+        
+        const optionsContainer = document.getElementById('options-container');
+        const arrangeContainer = document.getElementById('arrange-container');
+        const arrangeDropzone = document.getElementById('arrange-dropzone');
+        const arrangeWords = document.getElementById('arrange-words');
+        
+        const checkBtn = document.getElementById('check-btn');
+        const feedbackArea = document.getElementById('feedback-area');
+        const feedbackMessage = document.getElementById('feedback-message');
+        const feedbackIcon = document.getElementById('feedback-icon');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackDesc = document.getElementById('feedback-desc');
+        const correctAnswerText = document.getElementById('correct-answer-text');
+        
+        const heartsCountEl = document.getElementById('hearts-count');
+        const xpCountEl = document.getElementById('xp-count');
+
+        //        // --- FUNGSI UTAMA ---
+        function selectLevel(level) {
+            currentLevelId = level;
+            // Ambil semua soal dari level yang dipilih (pasti ada 10 soal di tiap level), lalu acak urutannya
+            const allShuffledQuestions = [...questionDatabase[level]].sort(() => Math.random() - 0.5); 
+            
+            // Potong 10 soal pertama (walaupun totalnya 10, ini memastikan kita tidak error jika database ditambah nanti)
+            currentQuestions = allShuffledQuestions.slice(0, 10);
+            
+            currentQuestionIndex = 0;
+            correctAnswersCount = 0;
+            totalQuestionsToPass = currentQuestions.length; 
+            
+            // Perbarui UI
+            updateProgress();
+            heartsCountEl.textContent = hearts;
+            xpCountEl.textContent = xp;
+
+            startScreen.classList.add('hidden');
+            completionScreen.classList.add('hidden');
+            appScreen.classList.remove('hidden');
+            appScreen.classList.add('flex');
+            
+            loadQuestion();
+        }
+
+        function updateProgress() {
+            // Hitung persentase berdasarkan jumlah jawaban yang BENAR
+            const percent = (correctAnswersCount / totalQuestionsToPass) * 100;
+            document.getElementById('progress-bar').style.width = Math.min(percent, 100) + '%';
+        }
+
+        function loadQuestion() {
+            if (currentQuestionIndex >= currentQuestions.length) {
+                showCompletionScreen();
+                return;
+            }
+
+            const q = currentQuestions[currentQuestionIndex];
+            questionTitle.textContent = q.title;
+            questionText.textContent = q.question;
+            
+            // Reset status
+            selectedAnswer = null;
+            arrangeSelectedWords = [];
+            hasCheckedAnswer = false;
+            
+            // Reset Tampilan Bawah
+            feedbackArea.className = 'absolute bottom-0 w-full border-t-2 border-gray-200 bg-white p-4 sm:p-6 transition-colors duration-300';
+            feedbackMessage.classList.add('hidden');
+            feedbackDesc.classList.add('hidden');
+            checkBtn.textContent = 'Cek Jawaban';
+            checkBtn.className = 'btn-bouncy w-full py-4 bg-gray-200 text-gray-400 font-bold rounded-xl text-xl uppercase tracking-wider disabled:opacity-50';
+            checkBtn.disabled = true;
+
+            // Render berdasarkan tipe soal
+            if (q.type === 'choice') {
+                optionsContainer.classList.remove('hidden');
+                arrangeContainer.classList.add('hidden');
+                arrangeContainer.classList.remove('flex');
+                renderChoices(q.options);
+            } else if (q.type === 'arrange') {
+                optionsContainer.classList.add('hidden');
+                arrangeContainer.classList.remove('hidden');
+                arrangeContainer.classList.add('flex');
+                renderArrange(q.words);
+            }
+        }
+
+        function renderChoices(options) {
+            optionsContainer.innerHTML = '';
+            // Acak posisi pilihan ganda
+            const shuffledOptions = [...options].sort(() => Math.random() - 0.5);
+            shuffledOptions.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'w-full p-4 text-left border-2 border-gray-200 rounded-xl font-medium text-lg text-gray-700 hover:bg-gray-50 transition-colors duration-200';
+                btn.style.boxShadow = '0 4px 0 #e5e7eb';
+                btn.textContent = opt;
+                btn.onclick = () => selectChoice(opt, btn);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function selectChoice(option, btnElement) {
+            if (hasCheckedAnswer) return;
+            selectedAnswer = option;
+            
+            // Visual feedback untuk pilihan
+            Array.from(optionsContainer.children).forEach(child => {
+                child.className = 'w-full p-4 text-left border-2 border-gray-200 rounded-xl font-medium text-lg text-gray-700 hover:bg-gray-50 transition-colors duration-200';
+                child.style.boxShadow = '0 4px 0 #e5e7eb';
+            });
+            
+            btnElement.className = 'w-full p-4 text-left border-2 border-blue-400 bg-blue-50 rounded-xl font-medium text-lg text-blue-700 transition-colors duration-200';
+            btnElement.style.boxShadow = '0 4px 0 #60a5fa';
+
+            enableCheckButton();
+        }
+
+        function renderArrange(words) {
+            arrangeDropzone.innerHTML = '';
+            arrangeWords.innerHTML = '';
+            
+            // Acak kata untuk ditampilkan di bawah
+            const shuffledWords = [...words].sort(() => Math.random() - 0.5);
+            
+            shuffledWords.forEach((word, index) => {
+                const wordSpan = document.createElement('span');
+                wordSpan.className = 'word-piece';
+                wordSpan.textContent = word;
+                wordSpan.dataset.index = index;
+                wordSpan.onclick = () => handleWordClick(wordSpan, word);
+                arrangeWords.appendChild(wordSpan);
+            });
+        }
+
+        function handleWordClick(wordEl, word) {
+            if (hasCheckedAnswer || wordEl.classList.contains('selected')) return;
+            
+            wordEl.classList.add('selected');
+            
+            const dropWord = document.createElement('span');
+            dropWord.className = 'word-piece';
+            dropWord.textContent = word;
+            dropWord.dataset.sourceIndex = wordEl.dataset.index;
+            dropWord.onclick = () => handleDropzoneClick(dropWord, wordEl);
+            
+            arrangeDropzone.appendChild(dropWord);
+            
+            arrangeSelectedWords.push(word);
+            checkArrangeCompletion();
+        }
+
+        function handleDropzoneClick(dropWord, sourceWordEl) {
+            if (hasCheckedAnswer) return;
+            
+            sourceWordEl.classList.remove('selected');
+            dropWord.remove();
+            
+            const index = arrangeSelectedWords.indexOf(dropWord.textContent);
+            if (index > -1) {
+                arrangeSelectedWords.splice(index, 1);
+            }
+            checkArrangeCompletion();
+        }
+
+        function checkArrangeCompletion() {
+            if (arrangeSelectedWords.length > 0) {
+                enableCheckButton();
+            } else {
+                checkBtn.disabled = true;
+                checkBtn.className = 'btn-bouncy w-full py-4 bg-gray-200 text-gray-400 font-bold rounded-xl text-xl uppercase tracking-wider disabled:opacity-50';
+            }
+        }
+
+        function enableCheckButton() {
+            checkBtn.disabled = false;
+            checkBtn.className = 'btn-bouncy w-full py-4 bg-green-500 text-white font-bold rounded-xl text-xl uppercase tracking-wider hover:bg-green-600';
+            checkBtn.style.boxShadow = '0 4px 0 #16a34a';
+        }
+
+        function handleMainAction() {
+            if (hasCheckedAnswer) {
+                nextQuestion();
+            } else {
+                checkAnswer();
+            }
+        }
+
+        function checkAnswer() {
+            const q = currentQuestions[currentQuestionIndex];
+            let isCorrect = false;
+
+            if (q.type === 'choice') {
+                isCorrect = (selectedAnswer === q.answer);
+            } else if (q.type === 'arrange') {
+                const userAnswerStr = arrangeSelectedWords.join(' ');
+                isCorrect = (userAnswerStr === q.answer);
+            }
+
+            hasCheckedAnswer = true;
+
+            if (isCorrect) {
+                correctAnswersCount++;
+                updateProgress();
+                xp += 10;
+                xpCountEl.textContent = xp;
+                showFeedback(true);
+            } else {
+                hearts--;
+                heartsCountEl.textContent = hearts;
+                
+                // JIKA SALAH, MASUKKAN SOAL INI KE ANTRIAN PALING BELAKANG
+                currentQuestions.push({...q});
+
+                showFeedback(false, q.answer);
+                document.getElementById('app-screen').classList.add('shake-animation');
+                setTimeout(() => document.getElementById('app-screen').classList.remove('shake-animation'), 400);
+
+                if (hearts <= 0) {
+                    setTimeout(() => {
+                        alert("Nyawa habis! Coba level ini lagi dari awal.");
+                        goToStartScreen();
+                    }, 1500);
+                    return; // Stop flow
+                }
+            }
+        }
+
+        function showFeedback(isCorrect, correctAnswer = '') {
+            feedbackMessage.classList.remove('hidden');
+            
+            if (isCorrect) {
+                feedbackArea.className = 'absolute bottom-0 w-full border-t-2 bg-green-100 border-green-200 p-4 sm:p-6 transition-colors duration-300';
+                feedbackIcon.className = 'w-10 h-10 rounded-full flex items-center justify-center text-xl font-bold bg-white text-green-500 shrink-0';
+                feedbackIcon.textContent = '✓';
+                feedbackTitle.textContent = 'Luar Biasa!';
+                feedbackTitle.className = 'font-bold text-xl text-green-700';
+                
+                checkBtn.className = 'btn-bouncy w-full py-4 bg-green-500 text-white font-bold rounded-xl text-xl uppercase tracking-wider hover:bg-green-600';
+                checkBtn.style.boxShadow = '0 4px 0 #16a34a';
+            } else {
+                feedbackArea.className = 'absolute bottom-0 w-full border-t-2 bg-red-100 border-red-200 p-4 sm:p-6 transition-colors duration-300';
+                feedbackIcon.className = 'w-10 h-10 rounded-full flex items-center justify-center text-xl font-bold bg-white text-red-500 shrink-0';
+                feedbackIcon.textContent = '✕';
+                feedbackTitle.textContent = 'Jawaban Kurang Tepat';
+                feedbackTitle.className = 'font-bold text-xl text-red-700';
+                
+                feedbackDesc.classList.remove('hidden');
+                feedbackDesc.className = 'text-base text-red-600';
+                correctAnswerText.textContent = correctAnswer;
+
+                checkBtn.className = 'btn-bouncy w-full py-4 bg-red-500 text-white font-bold rounded-xl text-xl uppercase tracking-wider hover:bg-red-600';
+                checkBtn.style.boxShadow = '0 4px 0 #dc2626';
+            }
+
+            checkBtn.textContent = 'Lanjutkan';
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            loadQuestion();
+        }
+
+        function showCompletionScreen() {
+            appScreen.classList.add('hidden');
+            appScreen.classList.remove('flex');
+            completionScreen.classList.remove('hidden');
+            completionScreen.classList.add('flex');
+            
+            document.getElementById('final-xp').textContent = xp + ' XP';
+        }
+
+        function continueLesson() {
+            // Lanjut belajar di level yang sama, soal akan diacak ulang dengan selectLevel
+            hearts = 5;
+            selectLevel(currentLevelId);
+        }
+
+        function goToStartScreen() {
+            appScreen.classList.add('hidden');
+            appScreen.classList.remove('flex');
+            completionScreen.classList.add('hidden');
+            completionScreen.classList.remove('flex');
+            startScreen.classList.remove('hidden');
+            
+            // Reset global stats
+            xp = 0;
+            hearts = 5;
+            currentLevelId = '';
+        }
+
+        // Fitur Text-to-Speech (Suara)
+        function playTTS() {
+            const textToSpeak = questionText.textContent;
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(textToSpeak);
+                utterance.lang = 'en-US'; // Bahasa Inggris
+                utterance.rate = 0.9; // Kecepatan sedikit lebih lambat
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("Browser Anda tidak mendukung fitur suara.");
+            }
+        }
+    </script>
+</body>
+</html>
